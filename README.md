@@ -5,6 +5,8 @@ The hash function is: h(k) = floor(m{kA}) where m is the size of the table, k is
 
 To compute k, I used a custom hashing method:
   For example we'll use the username, "misimpso"
+  
+  
   1)If the username isn't 16 char long it pads it with "_" until it is.
     ex: ________misimpso
     
