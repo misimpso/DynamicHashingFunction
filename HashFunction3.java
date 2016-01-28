@@ -3,15 +3,15 @@ import java.io.*;
 
 public class HashFunction3 {
   
-  SLItemList[] theArray;
-  int arraySize;
+  SLItemList[] theArray; //Creates the array of SLItemLists
+  int arraySize;         
   int customerNum;
   int salt;
   
-  public double load() {
-    if(customerNum == 0) return 0;
-    double loadNum = (customerNum/arraySize);
-    System.out.println("load = " + loadNum);
+  public double load() {                          //Load is the population of the table divided by the table size
+    if(customerNum == 0) return 0;                //If the load is greater than .75 than the table size gets increased.
+    double loadNum = (customerNum/arraySize);     //to the next prime number after doubling the initial size.
+    //System.out.println("load = " + loadNum);
     return loadNum;
   }
   
@@ -20,14 +20,14 @@ public class HashFunction3 {
       System.out.format("%d:", locate);
       SItem traverser = theArray[locate].firstWord;
       while(traverser != null){
-        System.out.format("%s,", traverser.userID);
+        System.out.format("%s [%d],", traverser.userID, traverser.customerID);
         traverser = traverser.next;
       }
       System.out.format("%n");
     }  
   }
-  
-  public int charToNum(char c) {
+  //*Part of the Hashing Function*
+  public int charToNum(char c) {                       //Coverts the character to its ASCII value
     int asciiVal = (int) c;
     if(asciiVal == 95) {
       return (asciiVal - 95);
@@ -41,39 +41,39 @@ public class HashFunction3 {
     return -1;
   }
   
-  public int stringToBitseq(String wordToHash) {
+  public int stringToBitseq(String wordToHash) {   //If the word isn't 16 characters long, pad it with "_" until it is
     String word = wordToHash;
     int wthBounds = 16 - (wordToHash.length());
     for(int s = 0;s < wthBounds; s++){
       word = "_" + word;
     } 
     
-    List<Integer> bitSeqAL = new ArrayList<Integer>(); 
-    for (int i = 0; i < word.length(); i++) {
-      int charCode = charToNum(word.charAt(i));
-      Integer x = new Integer(charCode);
-      String binary = Integer.toBinaryString(x);
-      int bounds = 6 - (binary.length());
+    List<Integer> bitSeqAL = new ArrayList<Integer>(); //Create an ArrayList of Integers for the easy of adding onto a 
+    for (int i = 0; i < word.length(); i++) {          //dynamic data-structure
+      int charCode = charToNum(word.charAt(i));        //Get the ASCII value of the character
+      Integer x = new Integer(charCode);               //Convert it from int to Integer
+      String binary = Integer.toBinaryString(x);       //Convert Integer to a string of binary
+      int bounds = 6 - (binary.length());              //If the binary string isnt 6 char long, then pad it with 0s
       for(int d = 0; d < bounds; d++){
         binary = "0" + binary;
       }
-      for(int f = 0; f < binary.length(); f++){
+      for(int f = 0; f < binary.length(); f++){        //Add it to the ArrayList
         String c = binary.charAt(f) + "";
         bitSeqAL.add(Integer.parseInt(c));
       }
     }
-    Integer[] bitSeqArray = bitSeqAL.toArray(new Integer[bitSeqAL.size()]);
+    Integer[] bitSeqArray = bitSeqAL.toArray(new Integer[bitSeqAL.size()]);  //Convert ArrayList to Array
     
-    for (int u = 0; u < bitSeqArray.length; u++){
+    /*for (int u = 0; u < bitSeqArray.length; u++){        //For fancy printing
       if(u % 6 == 0 && u != 0) System.out.print(" | ");
       System.out.print(bitSeqArray[u]);
     }
-    System.out.println();
+    System.out.println();*/
     
     int hexNum = 0;
     
-    for(int r = 0; r < bitSeqArray.length; r+=4) {
-      String num = "";
+    for(int r = 0; r < bitSeqArray.length; r+=4) { //Takes the four lowest bits converts them to hex, then adds it
+      String num = "";                             //to hexNum. Then moves to the next four bits.
       for(int index = 0; index < 4; index++) {
         num = bitSeqArray[index+r] + num + "";
       }
@@ -82,20 +82,20 @@ public class HashFunction3 {
       int hexInt = Integer.valueOf(hexStr, 16);
       hexNum += hexInt;
     }
-    hexNum += salt;
-    double a = 0.618;
+    hexNum += salt;                                //Adds the added hex values to a randomly generated number
+    double a = 0.618;                              //A real number used for multiplicative hashing
     
-    double fractional = hexNum * a;
-    double floorFrac = Math.floor(fractional);
-    fractional = fractional - floorFrac;
+    double fractional = hexNum * a;                //Some fraction
+    double floorFrac = Math.floor(fractional);     //Either 1 or 0
+    fractional = fractional - floorFrac;           //Removes the 1 in 1.XXX if it is there
     
-    int hashKey = (int) Math.floor(arraySize*fractional);
-    System.out.println("hexNum = " + hexNum + ", hashKey = " + hashKey);
+    int hashKey = (int) Math.floor(arraySize*fractional);  //the key needed for the hash function
+    //System.out.println("hexNum = " + hexNum + ", hashKey = " + hashKey);
     
     return hashKey;
     
   }
-  
+  //*End of the Hashing Function*
   
   
   HashFunction3(int size) {
@@ -106,7 +106,7 @@ public class HashFunction3 {
     theArray = new SLItemList[size];
     customerNum = 0;
     
-    // Fill the array with WordLists
+    // Fill the array with SLItemLists
     
     for (int i = 0; i < arraySize; i++) {
       
@@ -115,7 +115,7 @@ public class HashFunction3 {
     }
     
   }
-  public boolean isPrime(int number) {
+  public boolean isPrime(int number) {    //Checks if number is prime
     if(number % 2 == 0) return false;
     for(int i = 3; i*i <= number; i += 2){
       if(number % i == 0) return false;
@@ -123,23 +123,23 @@ public class HashFunction3 {
     return true;
   }
   
-  public int getNextPrime(int minNumToCheck) {
+  public int getNextPrime(int minNumToCheck) {    //Finds the next highest prime number.
     for(int i = minNumToCheck; true; i++) {
       if(isPrime(i)) return i;
     }
   }
   
-  public HashFunction3 reallocateArray(int minArraySize) {
-    int newArraySize = getNextPrime(minArraySize);
+  public HashFunction3 reallocateArray(int minArraySize) {  //Calls moveOldHashTable to reallocate the hash table based 
+    int newArraySize = getNextPrime(minArraySize);          //on the new prime size.
     
     return moveOldHashTable(newArraySize);
   }
   
-  public HashFunction3 moveOldHashTable(int newArraySize){
-    HashFunction3 temp = new HashFunction3(newArraySize);
-    System.out.println("I made it here!");
-    System.out.println("Array size = " + arraySize);
-    System.out.println("New Array Size = " + newArraySize);
+  public HashFunction3 moveOldHashTable(int newArraySize){  //Moves the old values of the hash table into their new
+    HashFunction3 temp = new HashFunction3(newArraySize);   //positions.
+    //System.out.println("I made it here!");
+    //System.out.println("Old Array size = " + arraySize);
+    //System.out.println("New Array Size = " + newArraySize);
     
     for(int i = 0; i < arraySize; i++) {
       SItem traverser = theArray[i].firstWord;
@@ -174,8 +174,6 @@ public class HashFunction3 {
     
     int hashKey = stringToBitseq(wordToFind);
     
-    // NEW
-    
     boolean theWord = theArray[hashKey].find(hashKey, wordToFind);
     
     return theWord;
@@ -188,8 +186,8 @@ public class HashFunction3 {
       String userID = elementsToAdd[i][0];
       int customerID = Integer.parseInt(elementsToAdd[i][1]);
       
-      // Create the Word with the word name and
-      // definition
+      // Create the userID with the word name and
+      // customerID
       
       SItem newWord = new SItem(userID, customerID);
       
@@ -214,7 +212,7 @@ public class HashFunction3 {
     
   }
   
-  public static boolean checkString(String word) {
+  public static boolean checkString(String word) {     //Checks to see if the word contains any special chars.
     int specials = 0, digits = 0, letters = 0, spaces = 0;
     for (int i = 0; i < word.length(); ++i) {
       char ch = word.charAt(i);
@@ -228,7 +226,7 @@ public class HashFunction3 {
         ++letters;
       }
     }
-    System.out.println("specials = " + specials + ", digits = " + digits + ", letters = " + letters + ", spaces = " + spaces);
+    //System.out.println("specials = " + specials + ", digits = " + digits + ", letters = " + letters + ", spaces = " + spaces);
     if(specials > 0 && spaces > 0) {
       System.out.println("No spaces and no special characers!");
       return true;
@@ -244,20 +242,16 @@ public class HashFunction3 {
   }
   
   public static void main(String[] args) {
-    if(args.length == 0) {
+    if(args.length == 0) { //Take user input
       Scanner input = new Scanner(System.in);
       
-      // Make a 11 item array that will hold words
-      // and definitions
       int arraySize = 2;
       
-      HashFunction3 wordHashTable = new HashFunction3(arraySize);
+      HashFunction3 wordHashTable = new HashFunction3(arraySize);  //Create the hash table
       
-      int customerID = 1;
+      int customerID = 1;  //Initialize the customer ID
       
       String word = "";
-      
-      // Keep retrieve requests until x is entered
       
       while (!word.equalsIgnoreCase("exit")) {
         
@@ -267,29 +261,30 @@ public class HashFunction3 {
         
         if (checkString(word)) {
         } else {
-          if(wordHashTable.load() >= 0.75){
-            System.out.println("making it bigger!");
-            arraySize *= 2;
-            wordHashTable = wordHashTable.reallocateArray(arraySize);
+          if(wordHashTable.load() >= 0.75){   //Check load to make sure we arent near capacity
+            //System.out.println("making it bigger!");
+            arraySize *= 2;                   //Double Arraysize
+            wordHashTable = wordHashTable.reallocateArray(arraySize);  //Reallocate the array into the new one.
           }
-          if(wordHashTable.find(word)) {
+          if(wordHashTable.find(word)) {      //If it's already there dont add it
             System.out.println("The username is already taken. Please Enter Another.");
+          } else if(word.equalsIgnoreCase("exit")){
+            System.out.println("Exiting");
           } else {
-            // Look for the word requested and print
-            // it out to screen
-            
-            String[][] elementToAdd = {{word, customerID + ""}};
+           
+            String[][] elementToAdd = {{word, customerID + ""}}; //Create 2D array with word and cusomterID
             
             wordHashTable.addTheArray(elementToAdd);
-            wordHashTable.print();
+            
             customerID++;
             //System.out.println(wordHashTable.find(wordLookUp));
           }
         }
       }
       input.close();
-    } else {
-      for(String a : args) {
+      wordHashTable.print();
+    } else {    //Accept files of usernames instead of user input
+      for(String a : args) {   
         File file = new File(a);
         try {
           Scanner scan = new Scanner(file);
@@ -303,20 +298,20 @@ public class HashFunction3 {
             if (checkString(word)) {
             } else {
               if(wordHashTable.load() >= 0.75){
-                System.out.println("making it bigger!");
+                //System.out.println("making it bigger!");
                 arraySize *= 2;
                 wordHashTable = wordHashTable.reallocateArray(arraySize);
               }
               if(wordHashTable.find(word)) {
                 System.out.println("The username is already taken. Please Enter Another.");
+              } else if(word.equalsIgnoreCase("exit")){
+                System.out.println("Exiting");
               } else {
-                // Look for the word requested and print
-                // it out to screen
                 
                 String[][] elementToAdd = {{word, customerID + ""}};
                 
                 wordHashTable.addTheArray(elementToAdd);
-                wordHashTable.print();
+                
                 customerID++;
                 //System.out.println(wordHashTable.find(wordLookUp));
               }
@@ -325,6 +320,7 @@ public class HashFunction3 {
             
           }
           scan.close();
+          wordHashTable.print();
         } catch(FileNotFoundException e) {
           e.printStackTrace();
         }
@@ -340,7 +336,7 @@ class SItem {
   
   public int key;
   
-  // Reference to next Word made in the WordList
+  // Reference to next Item in ItemList
   
   public SItem next;
   
