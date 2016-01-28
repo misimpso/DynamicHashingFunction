@@ -29,3 +29,8 @@ To compute k, I used a custom hashing method:
   Now we have k!
   
   
+The magic of this hashtable is it has the ability to grow depending on the load of the table. The load is the population of the table divided by the table's size. If the load is above .75, then it grows.
+  
+The table grows by doubling its original size then finding the next highest prime number. Having a prime table size is needed to resolve chaining when computing the hash key.
+  
+  
