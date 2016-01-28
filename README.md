@@ -1,5 +1,5 @@
 # DynamicHashTable
-This hashing function simulates a username storage system for 16 character long usernames. It uses multiplicative hashing to resolve any unwanted chaining.
+This hash table simulates a username storage system for 16 character long usernames. It uses multiplicative hashing along with singly-linked lists to resolve any unwanted chaining.
 
 The hash function is: h(k) = floor(m{kA}) where m is the size of the table, k is the username, and A is a constant (.618).
 
