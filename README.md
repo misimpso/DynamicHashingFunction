@@ -8,15 +8,19 @@ To compute k, I used a custom hashing method:
   
   
   1)If the username isn't 16 char long it pads it with "_" until it is.
+  
     ex: ________misimpso
     
   2)Each char is then converted to 6 bit binary, converting each "_" to 000000
+  
     ex: 000000 | 000000 | 000000 | 000000 | 000000 | 000000 | 000000 | 000000 | 010111 | 010011 | 011101 | 010011 | 010111 | 011010 | 011101 | 011001
     
   3) This binary number is then converted to hex.
+  
     ex: 0x000000005D37535DA759
     
   4) Each digit of the hex number is then added up. 5 + D(11) + 3 + 7 + ... etc
+  
     ex: 81
     
   5) A salt is randonly generated between 0 and the size of the table -1 and added to this number
